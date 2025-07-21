@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "*.mcmeta": "json",
+        "*.info": "json",
+        "*.hpp": "cpp",
+        "*.tcc": "cpp",
+        "bitset": "cpp",
+        "cassert": "cpp",
+        "string_view": "cpp"
+    }
+}
