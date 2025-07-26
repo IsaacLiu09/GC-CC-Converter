@@ -12,15 +12,17 @@ namespace gc_cc_converter {
     using namespace std::literals;
 
     struct YearInfo {
-        const std::string era_name;
-        const int ordinal;
-        const GanZhi year_gz;
+        std::string era_name;
+        int ordinal;
+        GanZhi year_gz;
+        constexpr YearInfo() = default;
         constexpr YearInfo(std::string era_name, const int ordinal, const GanZhi &year_gz) : era_name(std::move(era_name)), ordinal(ordinal), year_gz(year_gz) {}
     };
 
     struct MonthInfo {
-        const bool is_run;
-        const int ordinal;
+        bool is_run;
+        int ordinal;
+        constexpr MonthInfo() = default;
         constexpr MonthInfo(const bool is_run, const int ordinal) : is_run(is_run), ordinal(ordinal) {}
         constexpr std::string get_name() const {
             std::string result;
@@ -81,8 +83,9 @@ namespace gc_cc_converter {
     };
 
     struct DateInfo {
-        const int ordinal;
-        const GanZhi day_gz;
+        int ordinal;
+        GanZhi day_gz;
+        constexpr DateInfo() = default;
         constexpr DateInfo(const int ordinal, const GanZhi &day_gz) : ordinal(ordinal), day_gz(day_gz) {}
         constexpr std::string get_ordinal_name() const {
             switch (this->ordinal) {
@@ -122,9 +125,10 @@ namespace gc_cc_converter {
     };
 
     struct Date {
-        const YearInfo year;
-        const MonthInfo month;
-        const DateInfo info;
+        YearInfo year;
+        MonthInfo month;
+        DateInfo info;
+        constexpr Date() = default;
         constexpr Date(const YearInfo &year, const MonthInfo &month, const DateInfo &info) : year(year), month(month), info(info) {}
         std::string get_name() const {
             std::string year_ordinal_name;
@@ -140,16 +144,18 @@ namespace gc_cc_converter {
     constexpr Date illegal_date(illegal_year_info, illegal_month_info, illegal_date_info);
 
     struct Month {
-        const MonthInfo info;
-        const int day_cnt;
+        MonthInfo info;
+        int day_cnt;
+        constexpr Month() = default;
         constexpr Month(const bool is_run, const int ordinal, const int day_cnt) : info(is_run, ordinal), day_cnt(day_cnt) {}
     };
 
     struct Year {
-        const YearInfo info;
-        const std::vector<Month> months;
-        const GanZhi first_day_gz;
-        const int first_day_month, first_day_date;
+        YearInfo info;
+        std::vector<Month> months;
+        GanZhi first_day_gz;
+        int first_day_month, first_day_date;
+        constexpr Year() = default;
         constexpr Year(std::string era_name, const int ordinal, std::vector<Month> months, const GanZhi &year_gz, const GanZhi &first_day_gz, const int first_day_month, const int first_day_date) : info(std::move(era_name), ordinal, year_gz), months(std::move(months)), first_day_gz(first_day_gz), first_day_month(first_day_month), first_day_date(first_day_date) {}
         constexpr Date get_nth_date(const int n) const {
             int m = n;

@@ -8,6 +8,7 @@ namespace gc_cc_converter {
     
     struct TianGan {
         int x;
+        constexpr TianGan() : x(0) {};
         constexpr TianGan(const int x) : x(x) {}
         constexpr std::string get_name() const {
             switch (this->x) {
@@ -46,6 +47,7 @@ namespace gc_cc_converter {
 
     struct DiZhi {
         int y;
+        constexpr DiZhi() : y(0) {};
         constexpr DiZhi(const int y) : y(y) {}
         constexpr std::string get_name() const {
             switch (this->y) {
@@ -87,6 +89,7 @@ namespace gc_cc_converter {
     struct GanZhi {
         TianGan g;
         DiZhi z;
+        constexpr GanZhi() = default;
         constexpr GanZhi(const TianGan &g, const DiZhi &z) : g(g), z(z) {}
         constexpr std::string get_name() const {
             return this->g.get_name() + this->z.get_name();

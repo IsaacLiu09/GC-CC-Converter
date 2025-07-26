@@ -4,9 +4,10 @@
 #include "gan_zhi.hpp"
 #include "data.hpp"
 
+#include "bytell_hash_map.hpp"
+
 #include <cctype>
 #include <utility>
-#include <vector>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -17,7 +18,7 @@ namespace gc_cc_converter {
     using namespace std::literals;
 
     constexpr Month generate_month_data(std::string_view s) {
-        const int is_run = s[0] - '0';
+        const bool is_run = s[0] - '0';
         const int ordinal = (std::isdigit(s[1])) ? s[1] - '0' : s[1] - 'A' + 10;
         s.remove_prefix(3);
         int day_cnt = 0;
@@ -53,46 +54,22 @@ namespace gc_cc_converter {
     }
 
     class YearList {
-        constexpr static int OFFSET = 2000;
         std::string year_data_src;
-        std::vector<std::unique_ptr<Year>> year_data_after, year_data_before;
-        std::unique_ptr<Year> &find_year_data(int ordinal) {
-            ordinal -= OFFSET;
-            if (ordinal < 0) {
-                ordinal = ~ordinal;
-                if (static_cast<int>(this->year_data_before.size()) <= ordinal)
-                    this->year_data_before.resize(ordinal + 1);
-                return this->year_data_before[ordinal];
-            } else {
-                if (static_cast<int>(this->year_data_after.size()) <= ordinal)
-                    this->year_data_after.resize(ordinal + 1);
-                return this->year_data_after[ordinal];
-            }
-        }
+        ska::bytell_hash_map<int, Year> year_data;
     public:
-        YearList() : year_data_src("./data/default"s), year_data_after(100), year_data_before(100) {}
-        YearList(const std::string_view &year_data_src) : year_data_src(year_data_src), year_data_after(100), year_data_before(100) {}
+        YearList() : year_data_src("./data/default"s) {}
+        YearList(const std::string_view &year_data_src) : year_data_src(year_data_src) {}
         const Year &get_year_data(const int ordinal) {
-            auto &data_ptr = this->find_year_data(ordinal);
-            if (data_ptr == nullptr) {
+            if (year_data.count(ordinal) == 0) {
                 std::ifstream year_data_file(this->year_data_src + "/"s + std::to_string(ordinal) + ".txt"s);
                 if (!year_data_file)
                     throw std::runtime_error(std::format("无法找到年份数据：{:s}", this->year_data_src + "/"s + std::to_string(ordinal) + ".txt"s));
-                data_ptr = std::make_unique<Year>(generate_year_data(year_data_file));
+                year_data.emplace(ordinal, generate_year_data(year_data_file));
             }
-            return *data_ptr;
-        }
-        void shrink_to_fit() {
-            this->year_data_before.shrink_to_fit();
-            this->year_data_after.shrink_to_fit();
+            return year_data[ordinal];
         }
         void clear_buffer() {
-            this->year_data_before.resize(100);
-            this->year_data_after.resize(100);
-            for (auto &data_ptr : this->year_data_before)
-                data_ptr = nullptr;
-            for (auto &data_ptr : this->year_data_after)
-                data_ptr = nullptr;
+            this->year_data.clear();
         }
         void set_year_data_src(const std::string_view &src) {
             this->year_data_src = src;
